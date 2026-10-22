@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>ULA Barre — Muestra de maquetación</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  :root{
+    --paper:#FBF8F3;
+    --cream:#F3ECE3;
+    --sand:#E7DCCE;
+    --line:#D8C8B6;
+    --taupe:#A3866F;
+    --cocoa:#6E5546;
+    --choc:#3A2920;
+    --ink:#2E221B;
+  }
+  @page{ size:210mm 297mm; margin:0; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:#d9d3cc; }
+  body{
+    font-family:'Jost',sans-serif; font-weight:300; color:var(--ink);
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    font-feature-settings:"kern","liga","lnum";
+    font-variant-numeric:lining-nums;
+  }
+  .page{
+    width:210mm; height:297mm; position:relative; overflow:hidden;
+    background:var(--paper); page-break-after:always; break-after:page;
+    padding:20mm 16mm 22mm 24mm;            /* recto: spiral on the left */
+  }
+  .page.verso{ padding:20mm 24mm 22mm 16mm; } /* verso: spiral on the right */
+  .page:last-child{ page-break-after:auto; break-after:auto; }
+
+  /* ---------- running head ---------- */
+  .runhead{
+    position:absolute; top:11mm; left:24mm; right:16mm;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:6.6pt; letter-spacing:.28em; text-transform:uppercase; color:var(--taupe); font-weight:400;
+  }
+  .verso .runhead{ left:16mm; right:24mm; flex-direction:row-reverse; }
+  .runhead .ch b{ color:var(--choc); font-weight:500; margin-right:.6em; }
+  .runhead::after{
+    content:""; position:absolute; left:0; right:0; bottom:-3mm; height:.25pt; background:var(--line);
+  }
+
+  /* ---------- folio ---------- */
+  .folio{
+    position:absolute; bottom:11mm; right:16mm;
+    display:flex; align-items:baseline; gap:4mm;
+  }
+  .verso .folio{ right:auto; left:16mm; flex-direction:row-reverse; }
+  .folio .num{ font-family:'Cormorant Garamond',serif; font-size:17pt; font-weight:400; color:var(--choc); line-height:1; }
+  .folio .lbl{ font-size:6.2pt; letter-spacing:.3em; text-transform:uppercase; color:var(--taupe); }
+  .folio .dash{ width:9mm; height:.4pt; background:var(--taupe); align-self:center; }
+
+  /* ---------- title block ---------- */
+  .eyebrow{
+    display:flex; align-items:center; gap:3mm; margin-top:6mm;
+    font-size:7pt; letter-spacing:.32em; text-transform:uppercase; color:var(--taupe); font-weight:400;
+  }
+  .eyebrow .n{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:11pt; letter-spacing:.04em; color:var(--cocoa); text-transform:none; }
+  .eyebrow .rule{ width:10mm; height:.4pt; background:var(--taupe); }
+  h1{
+    font-family:'Cormorant Garamond',serif; font-weight:300; font-size:44pt; line-height:1.02;
+    letter-spacing:-.01em; color:var(--choc); margin:3.5mm 0 6mm;
+  }
+  h1 em{ font-style:italic; font-weight:300; color:var(--cocoa); }
+  .lead{
+    font-family:'Cormorant Garamond',serif; font-size:14.5pt; line-height:1.42; font-weight:400;
+    color:var(--cocoa); max-width:150mm;
+  }
+  .body{ font-size:9.6pt; line-height:1.7; color:#4a3a30; max-width:150mm; }
+  .body + .body{ margin-top:3mm; }
+  .cols{ display:grid; grid-template-columns:1fr 1fr; gap:9mm; margin-top:5mm; }
+  .cols .body{ max-width:none; }
+  .dropcap::first-letter{
+    font-family:'Cormorant Garamond',serif; float:left; font-size:40pt; line-height:.82;
+    padding:1.2mm 2mm 0 0; color:var(--taupe); font-weight:400;
+  }
+  .pull{
+    margin-top:6mm; padding-left:5mm; border-left:.8pt solid var(--taupe);
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15pt; color:var(--choc); line-height:1.3;
+  }
+
+  /* ---------- images ---------- */
+  .duo{ display:grid; grid-template-columns:1fr 1fr; gap:10mm; margin-top:9mm; padding:0 2mm; }
+  .duo.big .arch{ aspect-ratio:0.70; }
+  .duo.big.tight .arch{ aspect-ratio:0.77; }
+  .arch{
+    position:relative; width:100%; aspect-ratio:0.78; overflow:hidden;
+    border-radius:999px 999px 0 0; background:var(--sand);
+  }
+  .arch img{ width:100%; height:104%; object-fit:cover; object-position:50% 0%; display:block; }
+  .arch.tall{ aspect-ratio:0.72; }
+  .cap{
+    display:flex; align-items:baseline; gap:3mm; margin-top:4mm; padding-top:3mm; border-top:.4pt solid var(--line);
+  }
+  .cap .i{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13pt; color:var(--taupe); line-height:1; }
+  .cap .t{ font-size:7.4pt; letter-spacing:.26em; text-transform:uppercase; color:var(--choc); font-weight:500; }
+  .cap .d{ display:block; font-size:8.4pt; letter-spacing:0; text-transform:none; color:var(--cocoa); font-weight:300; margin-top:1.2mm; line-height:1.5; }
+
+  .flow{ position:relative; }
+  .flow .arrow{
+    position:absolute; left:50%; top:42%; transform:translate(-50%,-50%);
+    width:11mm; height:11mm; border-radius:50%; background:var(--paper); border:.5pt solid var(--line);
+    display:flex; align-items:center; justify-content:center; z-index:2;
+  }
+  .flow .arrow svg{ width:4.5mm; height:4.5mm; }
+
+  .trio{ display:grid; grid-template-columns:repeat(3,1fr); gap:6mm; margin-top:10mm; }
+  .trio .ph{ aspect-ratio:0.6; overflow:hidden; background:var(--sand); border-radius:1.2mm; }
+  .trio .ph img{ width:100%; height:100%; object-fit:cover; object-position:50% 40%; display:block; }
+
+  /* ---------- callouts ---------- */
+  .key{
+    position:absolute; left:24mm; right:16mm; bottom:28mm;
+    background:var(--choc); color:#F3ECE3; padding:9mm 11mm 9mm 30mm; border-radius:1.2mm;
+  }
+  .verso .key{ left:16mm; right:24mm; }
+  .key .q{
+    position:absolute; left:9mm; top:4mm; font-family:'Cormorant Garamond',serif; font-size:70pt; line-height:1; color:var(--taupe);
+  }
+  .key .k{ font-size:6.8pt; letter-spacing:.34em; text-transform:uppercase; color:#CDB7A3; font-weight:400; margin-bottom:2.5mm; }
+  .key p{ font-family:'Cormorant Garamond',serif; font-size:16pt; line-height:1.32; font-weight:400; }
+  .key p em{ font-style:italic; color:#E4D2C1; }
+
+  .remember{
+    position:absolute; left:24mm; right:16mm; bottom:28mm;
+    background:var(--cream); border-radius:1.2mm; padding:7.5mm 10mm;
+    display:grid; grid-template-columns:30mm 1fr 1fr; gap:0; align-items:center;
+  }
+  .verso .remember{ left:16mm; right:24mm; }
+  .remember .k{ font-size:6.8pt; letter-spacing:.34em; text-transform:uppercase; color:var(--taupe); font-weight:500; }
+  .remember .eq{ padding:0 7mm; border-left:.4pt solid var(--line); }
+  .remember .eq .a{ font-size:7pt; letter-spacing:.24em; text-transform:uppercase; color:var(--cocoa); font-weight:400; }
+  .remember .eq .b{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19pt; color:var(--choc); line-height:1.15; margin-top:1mm; }
+  .remember .note{ grid-column:2 / 4; margin-top:4mm; padding:3mm 7mm 0; border-top:.4pt solid var(--line); font-size:8.4pt; color:var(--cocoa); font-style:italic; }
+
+  .points{
+    position:absolute; left:24mm; right:16mm; bottom:28mm;
+    border-top:.8pt solid var(--choc); padding-top:5mm;
+  }
+  .verso .points{ left:16mm; right:24mm; }
+  .points .head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3mm; }
+  .points .head .k{ font-size:7pt; letter-spacing:.34em; text-transform:uppercase; color:var(--choc); font-weight:500; }
+  .points .head .s{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:11pt; color:var(--taupe); }
+  .points ol{ list-style:none; display:grid; grid-template-columns:1fr 1fr; column-gap:10mm; }
+  .points li{ display:flex; gap:4mm; align-items:baseline; padding:3.2mm 0; border-bottom:.4pt solid var(--line); font-size:9.4pt; line-height:1.45; color:#4a3a30; }
+  .points li .n{ font-family:'Cormorant Garamond',serif; font-size:13pt; color:var(--taupe); min-width:6mm; }
+
+  /* ---------- chapter opener accent (p.16) ---------- */
+  .ghost{
+    position:absolute; right:26mm; top:30mm; font-family:'Cormorant Garamond',serif; font-weight:300;
+    font-size:150pt; line-height:1; color:transparent; -webkit-text-stroke:.6pt var(--line); letter-spacing:-.02em;
+  }
+  .chapter-tag{
+    display:inline-flex; gap:3mm; align-items:center; margin-top:6mm;
+    font-size:6.8pt; letter-spacing:.32em; text-transform:uppercase; color:var(--paper);
+    background:var(--choc); padding:2mm 3.5mm; border-radius:.8mm; font-weight:400;
+  }
+  .side-mark{
+    position:absolute; top:0; bottom:0; width:3.2mm; background:var(--sand);
+  }
+  .recto .side-mark{ right:0; }
+  .verso .side-mark{ left:0; }
+  .side-mark span{
+    position:absolute; top:62mm; width:3.2mm; height:26mm; background:var(--taupe);
+  }
+  .side-mark.c4 span{ top:90mm; background:var(--choc); }
+</style>
+</head>
+<body>
+
+<!-- ======================= 13 ======================= -->
+<section class="page recto">
+  <div class="side-mark"><span></span></div>
+  <div class="runhead"><span class="ch"><b>03</b>El cuerpo en ULA Barre</span><span>Manual de formación</span></div>
+
+  <div class="eyebrow"><span class="n">03.4</span><span class="rule"></span><span>Técnica de barra</span></div>
+  <h1>Posición de <em>las manos</em></h1>
+  <p class="lead">Las manos se apoyan en la barra de forma ligera, sin agarrar, manteniendo la elegancia y la activación del tren superior.</p>
+  <p class="pull">La barra es un apoyo, no un punto de tracción.</p>
+
+  <div class="trio">
+    <figure>
+      <div class="ph"><img src="image7.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">i.</span><span class="t">Mano relajada<span class="d">Apoyo ligero con los dedos.</span></span></figcaption>
+    </figure>
+    <figure>
+      <div class="ph"><img src="image8.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">ii.</span><span class="t">Mano activa<span class="d">Presión suave para más estabilidad.</span></span></figcaption>
+    </figure>
+    <figure>
+      <div class="ph"><img src="image9.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">iii.</span><span class="t">Mano en extensión<span class="d">Según el ejercicio y la intención del brazo.</span></span></figcaption>
+    </figure>
+  </div>
+
+  <div class="key">
+    <span class="q">&ldquo;</span>
+    <div class="k">Clave ULA</div>
+    <p>La mano acompaña, no tira. <em>Mantén la conexión sin perder la elegancia del movimiento.</em></p>
+  </div>
+
+  <div class="folio"><span class="lbl">ULA Barre</span><span class="dash"></span><span class="num">13</span></div>
+</section>
+
+<!-- ======================= 14 ======================= -->
+<section class="page verso">
+  <div class="side-mark"><span></span></div>
+  <div class="runhead"><span class="ch"><b>03</b>El cuerpo en ULA Barre</span><span>Manual de formación</span></div>
+
+  <div class="eyebrow"><span class="n">03.5</span><span class="rule"></span><span>Técnica de barra</span></div>
+  <h1>Pierna base y <em>pierna de ejecución</em></h1>
+  <div class="cols">
+    <p class="body dropcap">Las dos piernas tienen funciones diferentes pero complementarias. La pierna de base soporta el peso del cuerpo y proporciona estabilidad y equilibrio; la pierna de ejecución es la que realiza el movimiento.</p>
+    <p class="body">La modelo permite identificar visualmente ambas funciones. La persona que imparte la clase debe enseñar primero la estabilidad de la pierna base y después la acción de la pierna de ejecución. Ambas trabajan juntas y tienen la misma importancia dentro del ejercicio.</p>
+  </div>
+
+  <div class="duo">
+    <figure>
+      <div class="arch"><img src="image10.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">01</span><span class="t">Pierna de base</span></figcaption>
+    </figure>
+    <figure>
+      <div class="arch"><img src="image11.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">02</span><span class="t">Pierna de ejecución</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="remember">
+    <div class="k">Recuerda</div>
+    <div class="eq"><div class="a">Pierna base</div><div class="b">= estabilidad</div></div>
+    <div class="eq"><div class="a">Pierna de ejecución</div><div class="b">= movimiento</div></div>
+    <div class="note">La modelo es la referencia visual.</div>
+  </div>
+
+  <div class="folio"><span class="lbl">ULA Barre</span><span class="dash"></span><span class="num">14</span></div>
+</section>
+
+<!-- ======================= 15 ======================= -->
+<section class="page recto">
+  <div class="side-mark"><span></span></div>
+  <div class="runhead"><span class="ch"><b>03</b>El cuerpo en ULA Barre</span><span>Manual de formación</span></div>
+
+  <div class="eyebrow"><span class="n">03.6</span><span class="rule"></span><span>Técnica de barra</span></div>
+  <h1>Transferencia <em>de peso</em></h1>
+  <p class="lead">Saber transferir el peso de forma controlada es esencial para mantener la estabilidad y la fluidez en los ejercicios.</p>
+  <p class="body" style="margin-top:3mm">Quien imparte la clase debe guiar el cambio del peso de una pierna a otra sin perder la alineación.</p>
+
+  <div class="duo flow big">
+    <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="#6E5546" stroke-width="1.2"><path d="M4 12h15M14 7l5 5-5 5"/></svg></div>
+    <figure>
+      <div class="arch"><img src="image12.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">01</span><span class="t">Inicio</span></figcaption>
+    </figure>
+    <figure>
+      <div class="arch"><img src="image13.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">02</span><span class="t">Transferencia</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="points">
+    <div class="head"><span class="k">Puntos clave</span><span class="s">Para guiar la clase</span></div>
+    <ol>
+      <li><span class="n">01</span>Mantén el core activo.</li>
+      <li><span class="n">02</span>La pelvis permanece estable.</li>
+      <li><span class="n">03</span>El movimiento es controlado y consciente.</li>
+      <li><span class="n">04</span>Evita balanceos o desplazamientos innecesarios.</li>
+    </ol>
+  </div>
+
+  <div class="folio"><span class="lbl">ULA Barre</span><span class="dash"></span><span class="num">15</span></div>
+</section>
+
+<!-- ======================= 16 ======================= -->
+<section class="page verso">
+  <div class="side-mark c4"><span></span></div>
+  <div class="ghost">04</div>
+  <div class="runhead"><span class="ch"><b>04</b>Técnica ULA Barre y posiciones básicas</span><span>Manual de formación</span></div>
+
+  <div class="chapter-tag">Capítulo 04 · Posiciones básicas</div>
+  <div class="eyebrow" style="margin-top:5mm"><span class="n">04.1</span><span class="rule"></span><span>Posición fundamental</span></div>
+  <h1>Demi-<em>plié</em></h1>
+  <p class="lead" style="max-width:112mm">El demi-plié es una flexión ligera de rodillas que activa el tren inferior y prepara para otros movimientos.</p>
+  <p class="body" style="margin-top:3mm">Es una posición fundamental en ULA Barre.</p>
+
+  <div class="duo flow big tight" style="margin-top:7mm">
+    <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="#6E5546" stroke-width="1.2"><path d="M4 12h15M14 7l5 5-5 5"/></svg></div>
+    <figure>
+      <div class="arch"><img src="image14.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">01</span><span class="t">Posición inicial</span></figcaption>
+    </figure>
+    <figure>
+      <div class="arch"><img src="image15.jpg" alt=""></div>
+      <figcaption class="cap"><span class="i">02</span><span class="t">Demi-plié</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="points">
+    <div class="head"><span class="k">Puntos clave</span><span class="s">Ejecución correcta</span></div>
+    <ol>
+      <li><span class="n">01</span>Pies en primera o segunda posición.</li>
+      <li><span class="n">02</span>Rodillas siguen la línea de los pies.</li>
+      <li><span class="n">03</span>Mantén el core activo y la espalda larga.</li>
+      <li><span class="n">04</span>El peso se mantiene en el centro de los pies.</li>
+    </ol>
+  </div>
+
+  <div class="folio"><span class="lbl">ULA Barre</span><span class="dash"></span><span class="num">16</span></div>
+</section>
+
+</body>
+</html>
