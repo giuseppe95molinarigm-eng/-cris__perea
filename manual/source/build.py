@@ -442,6 +442,10 @@ def render_late(pg):
     return top, mid, [], bot, 'late'
 
 # ------------------------------------------------------------------ chapter / TOC data
+import os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from annex import annex_pages
+SEM += annex_pages(figure_row, quote_html)
+
 chapters = []
 for pg in SEM:
     if not chapters or chapters[-1]['num'] != pg['chap']:
@@ -451,7 +455,7 @@ for pg in SEM:
 EXTRA_IMG = {1: 'image36.jpg', 2: 'image20.jpg', 3: 'image126.jpg', 4: 'image24.jpg', 12: 'image99.jpg'}
 OPENER_IMG = {'01': 'image138.jpg', '02': 'image42.jpg', '03': 'image12.jpg', '04': 'image32.jpg', '05': 'image33.jpg',
               '06': 'image91.jpg', '07': 'image115.jpg', '08': 'image123.jpg', '09': 'image139.jpg', '10': 'image122.jpg',
-              '11': 'image46.jpg'}
+              '11': 'image46.jpg', '12': 'image44.jpg'}
 
 # physical page numbering: 1 cover, 2 inside cover, 3-4 TOC, then per chapter opener + pages
 phys = 5
@@ -477,7 +481,8 @@ def shell(phys, inner, cls='', chapnum=None, chapname=None, folio=True):
     return f'<section class="page {s} {cls}" data-p="{phys}">{tab}<div class="trim">{rh}{inner}{fo}</div></section>'
 
 def content_page(pg):
-    if pg['n'] >= 75: top, mid, lists, bottom, kind = render_late(pg)
+    if pg.get('custom'): top, mid, lists, bottom, kind = pg['custom']
+    elif pg['n'] >= 75: top, mid, lists, bottom, kind = render_late(pg)
     else: top, mid, lists, bottom, kind = render_generic(pg)
     kick = f'<div class="kicker">{esc(fix_case(pg["kicker"]))}</div>' if pg.get('kicker') else ''
     head = f'''<header class="ph">
@@ -509,11 +514,13 @@ def opener(ch):
 def toc_pages():
     entries = []
     for ch in chapters:
+        entries.append('<li class="grp"><ol>')
         entries.append(f'<li class="tch"><span class="cn">{ch["num"]}</span><span class="ct">{esc(ch["name"])}</span><span class="cp">{ch["phys"]}</span></li>')
         for p in ch['pages']:
             entries.append(f'<li class="tsec"><span class="sn">{p["sec"]}</span><span class="st">{esc(fix_case(p["title"]))}</span><span class="dots"></span><span class="sp">{p["phys"]}</span></li>')
+        entries.append('</ol></li>')
     # split roughly in half at a chapter boundary
-    idx = [k for k, e in enumerate(entries) if 'class="tch"' in e]
+    idx = [k for k, e in enumerate(entries) if 'class="grp"' in e]
     half = min(idx, key=lambda k: abs(k - len(entries) / 2))
     a, b = entries[:half], entries[half:]
     p1 = shell(3, f'''<div class="toc"><div class="eyebrow"><span class="rule"></span><span>Contenido</span></div><h1>Índice</h1>
